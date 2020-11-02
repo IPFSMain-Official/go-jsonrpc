@@ -652,7 +652,8 @@ func (c *wsConn) handleWsConn(ctx context.Context) {
 			}
 			c.writeLk.Unlock()
 			log.Errorw("Connection timeout", "remote", c.conn.RemoteAddr())
-			return
+			// Maybe the server was just shut down for a while, and then it started up again.
+			continue
 		case <-c.stop:
 			c.writeLk.Lock()
 			cmsg := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "")
