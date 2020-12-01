@@ -652,7 +652,11 @@ func (c *wsConn) handleWsConn(ctx context.Context) {
 			}
 			c.writeLk.Unlock()
 			log.Errorw("Connection timeout", "remote", c.conn.RemoteAddr())
-			// Maybe the server was just shut down for a while, and then it started up again.
+			// The server side does not perform the reconnect operation, so need to exit
+			if c.connFactory == nil {
+				return
+			}
+			// The client performs the reconnect operation, and if it exits it cannot start a handleWsConn again, so it does not need to exit
 			continue
 		case <-c.stop:
 			c.writeLk.Lock()
