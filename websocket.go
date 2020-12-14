@@ -545,7 +545,10 @@ func (c *wsConn) handleWsConn(ctx context.Context) {
 		var timeoutCh <-chan time.Time
 		if timeoutTimer != nil {
 			if !timeoutTimer.Stop() {
-				<-timeoutTimer.C
+				select {
+				case <-timeoutTimer.C:
+				default:
+				}
 			}
 			timeoutTimer.Reset(c.timeout)
 
